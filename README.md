@@ -124,7 +124,7 @@ if __name__ == "__main__":
     shield = Shield()
     shield_group = pygame.sprite.Group()
     shield_group.add(shield)
-    mouse_pos = (300, 100)
+    mouse_pos = (400, 300)
 
     mouse_check = 0
     alien_shooting = 0
@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
         #GAME_PLAY 상태일 떄 아이템이 몬스터볼을 던짐
         if game_state == GAME_PLAY:
-            if time_counting % 240 == 0:
+            if time_counting % 260 == 0:
                 if items.state == ITEMS_READY:
                     ttt = 0
                     item.fire(powers, directions)
@@ -278,31 +278,33 @@ if __name__ == "__main__":
             catapult_count -= 1
             if catapult_count == 0:
                 game_state = GAME_OVER
-
+                
         #items과 catapult의 충돌 여부를 확인함
         if catapult.alive():
             collidedse = pygame.sprite.groupcollide(items_group, catapult_group, True, False)
             if collidedse:
                 shields += 1
-                #여기 바꿔줘야함 shield가 투석기를 따라가게 만들어야함.
-                shield.rect.x = \
-                    (catapult.rect.x + catapult.rect.width/2) - \
-                    shield.rect.width/2
-                shield.rect.y = \
-                    (catapult.rect.x + catapult.rect.width/2) - \
-                    shield.rect.height/2
+                #shield가 catapult를 따라가게 만들어야함.
+                shield.rect.x = catapult.rect.x
+                
+                shield.rect.y = catapult.rect.y
+
 
         #shield와 missile의 충돌 여부를 확인함
         if shield.alive():
-            collidede = pygame.sprite.groupcollide(missile_group, shield_group, True, True)
+            collidede = pygame.sprite.groupcollide(missile_group, shield_group, False, True)
             if collidede:
-                shields -= 1
                 explosion.rect.x = \
                     (catapult.rect.x + catapult.rect.width/2) -\
                     explosion.rect.width/2
                 explosion.rect.y = \
                     (catapult.rect.y + catapult.rect.width/2) -\
                     explosion.rect.height/2
+                
+        elif not explosion.alive():
+            items_group.add(items)
+            shield_group.add(shield)
+            shields -= 1
 
         #외계인이 살아 있는데 돌멩이 수가 0이면 게임 오버.
         if alien.alive() and stone_count == 0:
